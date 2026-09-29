@@ -1,0 +1,28 @@
+# Build output
+backend/target/
+frontend/dist/
+frontend/node_modules/
+
+# Downloaded local AI artifacts (fetched by scripts/fetch-*.ps1, never committed)
+models/
+tools/
+
+# Captured Qualcomm verification evidence (written by
+# scripts/verify-geniex-npu.ps1). A capture is specific to one device and one
+# run, so it is not committed; docs/evidence/README.md explains the shape.
+artifacts/
+
+# Local logs
+*.log
+
+# Emitted by `tsc -b`: tsconfig.node.json is a composite project, so the build
+# writes vite.config.js next to vite.config.ts and shadows the real config.
+frontend/vite.config.js
+frontend/vite.config.d.ts
+
+# IDE / tooling state (contains machine specific absolute paths and session data)
+**/modernize/
+.vscode/
+*.iml
+.DS_Store
+.history/

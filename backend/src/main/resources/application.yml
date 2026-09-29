@@ -1,0 +1,81 @@
+server:
+  port: 8080
+  servlet:
+    context-path: ""
+
+spring:
+  application:
+    name: codeguard-ai
+  jackson:
+    default-property-inclusion: non_null
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+codeguard:
+  heuristics:
+    # CodeGuard's own token based heuristic layer. These checks are NOT
+    # performed by PMD, Checkstyle or SpotBugs and are reported under the
+    # "CodeGuard-Heuristics" analyzer name. Disabled by default so a normal
+    # scan reports only genuine analyzer findings. Set to true to enable the
+    # educational demo snippets.
+    enabled: false
+  ai:
+    provider: llama-server
+    base-url: http://127.0.0.1:8081
+    # llama-server reports the served model by the path passed to --model, so
+    # this must match what start-llama.ps1 launches. Using the "file" alias
+    # lets the server accept the short name too.
+    model: qwen2.5-coder-1.5b-instruct-q4_k_m.gguf
+    runtime: llama-cpp-server
+    timeout-ms: 30000
+    context-length: 2048
+    temperature: 0.2
+    privacy-mode: true
+    # When true, GET /api/runtime actively probes the local provider instead of
+    # reporting configuration values only. Configuration alone is never
+    # reported as a working AI provider.
+    health-check-enabled: true
+  qualcomm:
+    deployment-mode: development
+    model-id: configurable-model-id
+    runtime: qualcomm-ai-runtime
+    execution-target: snapdragon-hardware-or-qairt
+    # This flag is configuration intent only. It is never accepted as proof of
+    # NPU execution; the verdict comes from the verification gates below.
+    npu-execution-verified: false
+    enabled: false
+    # GenieX local server ("geniex serve <model> --connection-mode local").
+    # Loopback only: a Qualcomm Device Cloud device is reached by forwarding its
+    # port over SSH (scripts/start-geniex-tunnel.ps1), never by putting a remote
+    # host in base-url. Keep enabled=false unless a GenieX server is in use.
+    server:
+      enabled: false
+      base-url: http://127.0.0.1:18181
+      # Exact identifier as reported by GET /v1/models, e.g.
+      # qualcommiq/Llama-3.1-8B-Instruct:8b-precision-rr-20250504
+      model: ""
+      compute-unit: npu
+      connect-timeout-ms: 1500
+      read-timeout-ms: 5000
+    # Evidence rules behind qualcommNpuVerified. See docs/QUALCOMM-GENIEX.md.
+    verification:
+      # both = a live server round trip AND a benchmark artifact must agree.
+      # http cannot prove which compute unit ran and therefore never reports a
+      # verified NPU; artifact skips the live check; disabled collects nothing.
+      mode: both
+      artifact-path: artifacts/qualcomm/geniex-bench.json
+      require-device: npu
+      max-artifact-age-days: 30
+      inference-probe-enabled: true
+      chipset-label: ""
+      # Only set true when the evidence describes a remote Snapdragon device
+      # reached over a tunnel while CodeGuard runs on this workstation.
+      allow-remote-device: false
+    cli:
+      executable: ""
+      extra-search-paths: []
+
