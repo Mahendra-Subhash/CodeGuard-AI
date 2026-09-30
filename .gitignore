@@ -2,6 +2,7 @@
 backend/target/
 frontend/dist/
 frontend/node_modules/
+*.tsbuildinfo
 
 # Downloaded local AI artifacts (fetched by scripts/fetch-*.ps1, never committed)
 models/
@@ -19,6 +20,9 @@ artifacts/
 # writes vite.config.js next to vite.config.ts and shadows the real config.
 frontend/vite.config.js
 frontend/vite.config.d.ts
+
+# Temporary marker files
+*.done
 
 # IDE / tooling state (contains machine specific absolute paths and session data)
 **/modernize/
